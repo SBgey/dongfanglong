@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>系统初始化向导</title>
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Segoe UI",system-ui,-apple-system,sans-serif
+}
+
+body{
+  width:100vw;
+  height:100vh;
+  color:#1f2937;
+  overflow:hidden;
+  background-color:#f7faff;
+  transition: color 1.5s ease;
+}
+
+.wrap{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+
+  background:
+    radial-gradient(circle at 15% 10%, rgba(180, 220, 255, 0.55), transparent 24%),
+    radial-gradient(circle at 85% 20%, rgba(210, 230, 255, 0.45), transparent 26%),
+    radial-gradient(circle at 50% 95%, rgba(200, 225, 255, 0.35), transparent 28%),
+    linear-gradient(180deg, #ffffff 0%, #f0f6ff 45%, #f7fbff 100%);
+
+  background-size: 200% 200%;
+  animation: bgShift 6s ease infinite alternate;
+  transition: background 1.5s ease, color 1.5s ease;
+}
+
+.wrap.dark{
+  background:
+    radial-gradient(circle at 15% 10%, rgba(50, 90, 160, 0.55), transparent 24%),
+    radial-gradient(circle at 85% 20%, rgba(70, 60, 140, 0.45), transparent 26%),
+    radial-gradient(circle at 50% 95%, rgba(30, 60, 120, 0.35), transparent 28%),
+    linear-gradient(180deg, #0b1220 0%, #0f1a2e 45%, #141830 100%);
+}
+
+.wrap::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 25% 80%, rgba(160, 200, 240, 0.18), transparent 40%);
+  pointer-events:none;
+}
+
+.wrap.dark::before{
+  background:
+    radial-gradient(circle at 25% 80%, rgba(60, 120, 200, 0.12), transparent 40%);
+}
+
+@keyframes bgShift{
+  0%{
+    background-position: 0% 0%;
+  }
+  100%{
+    background-position: 100% 100%;
+  }
+}
+
+.step-box{
+  width:640px;
+  padding:40px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.72);
+  box-shadow:
+    0 10px 30px rgba(140, 180, 220, 0.18),
+    0 2px 6px rgba(140, 180, 220, 0.12);
+  backdrop-filter: blur(10px);
+  opacity:0;
+  transform:translateY(14px);
+  transition: all 0.35s ease;
+  display:none;
+  z-index:2;
+}
+
+.step-box.active{
+  display:block;
+  opacity:1;
+  transform:translateY(0);
+}
+
+.title{
+  font-size:30px;
+  font-weight:600;
+  color:#103557;
+  margin-bottom:12px;
+}
+
+.desc{
+  color:#5b6b7f;
+  font-size:15px;
+  margin-bottom:34px;
+  line-height:1.6;
+}
+
+.select-wrap{
+  margin-bottom:36px;
+}
+
+select,
+input{
+  width:100%;
+  padding:13px 16px;
+  font-size:16px;
+  color:#1f2937;
+  background:#ffffff;
+  border:1px solid #d7e4f3;
+  border-radius:10px;
+  outline:none;
+  transition:0.2s;
+}
+
+select:focus,
+input:focus{
+  border-color:#54a8ff;
+  box-shadow:0 0 0 3px rgba(84, 168, 255, 0.18);
+}
+
+.btn-group{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:12px;
+}
+
+button{
+  padding:10px 22px;
+  font-size:15px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.btn-back{
+  background:transparent;
+  color:#4a6587;
+}
+
+.btn-back:hover{
+  background:#eaf2ff;
+}
+
+.btn-next{
+  background:#167dff;
+  color:#fff;
+}
+
+.btn-next:hover{
+  background:#0f6ae6;
+}
+
+.btn-skip{
+  background:transparent;
+  color:#4a6587;
+  margin-right:auto;
+}
+
+.btn-skip:hover{
+  background:#eaf2ff;
+}
+
+.btn-back:disabled{
+  color:#9fb0c4;
+  cursor:not-allowed;
+  background:transparent;
+}
+
+.dots{
+  position:absolute;
+  bottom:50px;
+  display:flex;
+  gap:10px;
+  z-index:2;
+}
+
+.dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#b9cce4;
+  transition:0.25s;
+}
+
+.dot.active{
+  background:#167dff;
+  width:22px;
+  border-radius:5px;
+}
+
+.wrap.dark .step-box{
+  background:rgba(20, 24, 48, 0.78);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.wrap.dark .title{
+  color:#e6f1ff;
+}
+
+.wrap.dark .desc{
+  color:#9fb3d1;
+}
+
+.wrap.dark select,
+.wrap.dark input{
+  background:#121829;
+  color:#e6f1ff;
+  border-color:#2a3558;
+}
+
+.wrap.dark .btn-back{
+  color:#9fb3d1;
+}
+
+.wrap.dark .btn-back:hover{
+  background:#1a2240;
+}
+
+.wrap.dark .btn-skip{
+  color:#9fb3d1;
+}
+
+.wrap.dark .btn-skip:hover{
+  background:#1a2240;
+}
+
+.wrap.dark .dot{
+  background:#3a4a78;
+}
+
+.wrap.dark .dot.active{
+  background:#54a8ff;
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="step-box active" data-step="1">
+    <h2 class="title">选择国家或地区</h2>
+    <p class="desc">这是系统用于调整时间、格式和区域设置的位置</p>
+    <div class="select-wrap">
+      <select id="country">
+        <option value="CN">中国</option>
+        <option value="US">美国</option>
+        <option value="JP">日本</option>
+        <option value="KR">韩国</option>
+      </select>
+    </div>
+    <div class="btn-group">
+      <button class="btn-skip" onclick="skipOOBE()">跳过</button>
+      <button class="btn-back" disabled>上一步</button>
+      <button class="btn-next" onclick="nextStep()">下一步</button>
+    </div>
+  </div>
+
+  <div class="step-box" data-step="2">
+    <h2 class="title">选择输入法</h2>
+    <p class="desc">选择你常用的键盘布局</p>
+    <div class="select-wrap">
+      <select id="input">
+        <option value="zh">中文（简体）- 微软拼音</option>
+        <option value="en">英文 - QWERTY</option>
+      </select>
+    </div>
+    <div class="btn-group">
+      <button class="btn-skip" onclick="skipOOBE()">跳过</button>
+      <button class="btn-back" onclick="prevStep()">上一步</button>
+      <button class="btn-next" onclick="nextStep()">下一步</button>
+    </div>
+  </div>
+
+  <div class="step-box" data-step="3">
+    <h2 class="title">给你的设备起个名字</h2>
+    <p class="desc">设备名称将在网络中显示，方便识别</p>
+    <div class="select-wrap">
+      <input id="devname" placeholder="例如：LongPC-01" maxlength="16">
+    </div>
+    <div class="btn-group">
+      <button class="btn-skip" onclick="skipOOBE()">跳过</button>
+      <button class="btn-back" onclick="prevStep()">上一步</button>
+      <button class="btn-next" onclick="nextStep()">下一步</button>
+    </div>
+  </div>
+
+  <div class="step-box" data-step="4">
+    <h2 class="title">准备就绪</h2>
+    <p class="desc">你的设备设置即将完成，马上进入桌面</p>
+    <div class="btn-group">
+      <button class="btn-skip" onclick="skipOOBE()">跳过</button>
+      <button class="btn-back" onclick="prevStep()">上一步</button>
+      <button class="btn-next" onclick="finishOOBE()">完成</button>
+    </div>
+  </div>
+
+  <div class="dots">
+    <div class="dot active" data-dot="1"></div>
+    <div class="dot" data-dot="2"></div>
+    <div class="dot" data-dot="3"></div>
+    <div class="dot" data-dot="4"></div>
+  </div>
+</div>
+
+<script>
+let currentStep = 1;
+const maxStep = 4;
+const wrap = document.getElementById('wrap');
+
+function renderStep(){
+  document.querySelectorAll('.step-box').forEach(el=>el.classList.remove('active'))
+  document.querySelector(`.step-box[data-step="${currentStep}"]`).classList.add('active')
+
+  document.querySelectorAll('.dot').forEach(d=>d.classList.remove('active'))
+  document.querySelector(`.dot[data-dot="${currentStep}"]`).classList.add('active')
+}
+
+function nextStep(){
+  if(currentStep < maxStep){
+    currentStep += 1;
+    renderStep();
+  }
+}
+
+function prevStep(){
+  if(currentStep > 1){
+    currentStep -= 1;
+    renderStep();
+  }
+}
+
+function skipOOBE(){
+  const cfg = {
+    country: document.getElementById('country').value,
+    inputMethod: document.getElementById('input').value,
+    deviceName: document.getElementById('devname').value || "LongPC"
+  }
+  console.log("OOBE已跳过，使用默认配置：", cfg)
+  alert("已跳过初始化，使用默认配置进入系统。")
+}
+
+function finishOOBE(){
+  const cfg = {
+    country: document.getElementById('country').value,
+    inputMethod: document.getElementById('input').value,
+    deviceName: document.getElementById('devname').value || "LongPC"
+  }
+  console.log("OOBE配置完成：", cfg)
+  alert("初始化完成！\n国家："+cfg.country+"\n输入法："+cfg.inputMethod+"\n设备名："+cfg.deviceName)
+}
+
+// 色相变化：更快，蓝色明显流动
+let hue = 200;
+setInterval(()=>{
+  hue = (hue + 0.6) % 360;
+  wrap.style.filter = `hue-rotate(${hue}deg)`;
+}, 40);
+
+// 3秒后自动切深色，很快就能看到效果
+setTimeout(()=>{
+  wrap.classList.add('dark');
+}, 3000);
+</script>
+</body>
+</html>
